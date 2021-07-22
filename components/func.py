@@ -42,16 +42,16 @@ class DAE_Parser(object):
             self.xmldae = minidom.parse(self.dae)
             self.matlist = self.xmldae.getElementsByTagName('init_from')
             for i in self.matlist:
-                if re.match(r'.[A-z0-9]+$', i.firstChild.nodeValue):
-                    pass
+                if re.search('(?=static_objects)\S+', str(i.firstChild.nodeValue)):
+                    regex_tmp = re.search('(?=static_objects)\S+', str(i.firstChild.nodeValue))
+                    try:
+                        self.parselist.append(regex_tmp.group(0))
+                    except AttributeError:
+                        err = open('out/errorlog.txt', 'a')
+                        err.writelines('[INVALID ATTRIBUTE CONTENT]: ' + i.firstChild.nodeValue + '\n')
+                        err.close()
             else:
-                regex_tmp = re.search('(?=static_objects)\S+', str(i.firstChild.nodeValue))
-                try:
-                    self.parselist.append(regex_tmp.group(0))
-                except AttributeError:
-                    err = open('out/errorlog.txt', 'a')
-                    err.writelines('[INVALID ATTRIBUTE CONTENT]: ' + i.firstChild.nodeValue + '\n')
-                    err.close()
+                pass
         except PermissionError:
             err = open('out/errorlog.txt', 'a')
             err.writelines('[INVALID PATH]: ' + self.dae + '\n')
